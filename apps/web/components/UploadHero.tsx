@@ -3,44 +3,84 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
+async function readJson(res: Response): Promise<Record<string, unknown>> {
+  const text = await res.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    // Safari can throw "The string did not match the expected pattern"
+    // when response.json() hits empty/non-JSON bodies.
+    throw new Error(
+      res.ok
+        ? "Unexpected server response. Please try again."
+        : "Upload failed. Please try again.",
+    );
+  }
+}
+
+function friendlyError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : "Something went wrong";
+  if (/did not match the expected pattern|unexpected end of json|JSON/i.test(msg)) {
+    return "Upload failed. Please try again.";
+  }
+  return msg;
+}
+
 export function UploadHero() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "uploading" | "parsing">("idle");
   const [pending, startTransition] = useTransition();
+  const inFlight = useRef(false);
 
   async function handleFile(file: File) {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setError(null);
     setPhase("uploading");
 
     try {
       const createRes = await fetch("/api/sessions", { method: "POST" });
+      const created = await readJson(createRes);
       if (!createRes.ok) {
+        throw new Error(
+          typeof created.error === "string"
+            ? created.error
+            : "Could not start a split session",
+        );
+      }
+      const sessionId = created.id;
+      if (typeof sessionId !== "string" || !sessionId) {
         throw new Error("Could not start a split session");
       }
-      const session = (await createRes.json()) as { id: string };
 
       setPhase("parsing");
       const form = new FormData();
       form.append("image", file);
 
-      const parseRes = await fetch(`/api/sessions/${session.id}/parse`, {
+      const parseRes = await fetch(`/api/sessions/${sessionId}/parse`, {
         method: "POST",
         body: form,
       });
-
-      const payload = await parseRes.json();
+      const payload = await readJson(parseRes);
       if (!parseRes.ok) {
-        throw new Error(payload.error ?? "Could not read that receipt");
+        throw new Error(
+          typeof payload.error === "string"
+            ? payload.error
+            : "Could not read that receipt",
+        );
       }
 
       startTransition(() => {
-        router.push(`/s/${session.id}`);
+        router.push(`/s/${sessionId}`);
       });
     } catch (err) {
       setPhase("idle");
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(friendlyError(err));
+    } finally {
+      inFlight.current = false;
     }
   }
 

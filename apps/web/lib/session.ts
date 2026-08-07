@@ -72,7 +72,10 @@ export async function getSessionPayload(id: string) {
     tip: session.tip,
     imagePath: session.imagePath,
     imageUrl: session.imagePath
-      ? `/api/uploads/${session.imagePath.replace(/^uploads\//, "")}`
+      ? session.imagePath.startsWith("http://") ||
+        session.imagePath.startsWith("https://")
+        ? session.imagePath
+        : `/api/uploads/${session.imagePath.replace(/^uploads\//, "")}`
       : null,
     items,
     people,

@@ -15,6 +15,8 @@ docs/             Store prep checklist
 
 - Node.js 22+
 - Anthropic API key (receipt parsing via Claude)
+- PostgreSQL (`DATABASE_URL`) — Neon on Vercel
+- Vercel Blob (`BLOB_READ_WRITE_TOKEN`) for receipt photos on Vercel
 - Optional: Stripe keys, Expo account for EAS
 
 ## Setup
