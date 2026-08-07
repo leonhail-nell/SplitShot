@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { validateRegisterInput } from "@splitshot/shared";
 import { register } from "@/lib/api";
 import { colors, fonts, type } from "@/lib/theme";
 
@@ -56,11 +57,24 @@ export default function RegisterScreen() {
               setBusy(true);
               setError(null);
               try {
-                await register(name.trim(), email.trim(), password);
+                const parsed = validateRegisterInput({ name, email, password });
+                if (!parsed.ok) {
+                  setError(parsed.error);
+                  return;
+                }
+                await register(
+                  parsed.data.name,
+                  parsed.data.email,
+                  parsed.data.password,
+                );
                 router.replace("/history");
               } catch (err) {
+                const message =
+                  err instanceof Error ? err.message : "Registration failed";
                 setError(
-                  err instanceof Error ? err.message : "Registration failed",
+                  /did not match the expected pattern|JSON/i.test(message)
+                    ? "Registration failed"
+                    : message,
                 );
               } finally {
                 setBusy(false);

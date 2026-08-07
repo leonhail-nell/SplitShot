@@ -33,7 +33,15 @@ async function authHeaders(
 }
 
 async function readJson<T>(res: Response): Promise<T> {
-  const payload = await res.json().catch(() => ({}));
+  const text = await res.text().catch(() => "");
+  let payload: unknown = {};
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = {};
+    }
+  }
   if (!res.ok) {
     throw new Error(
       typeof (payload as { error?: string })?.error === "string"

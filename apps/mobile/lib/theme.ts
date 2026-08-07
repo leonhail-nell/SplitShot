@@ -19,11 +19,26 @@ export const colors = {
   bg: "#d5e0d8",
 } as const;
 
-/** Web body background layers (globals.css) */
+/**
+ * Web body background layers (globals.css):
+ *   radial #c9ddd4 at 10%/-10%, radial #b7cfc8 at 90%/0%,
+ *   linear 160deg #e7efe8 → #d5e0d8 45% → #c7d4cd
+ */
 export const atmosphere = {
   base: ["#e7efe8", "#d5e0d8", "#c7d4cd"] as const,
   mistLeft: "#c9ddd4",
   mistRight: "#b7cfc8",
+} as const;
+
+/** Web --shadow on .upload-cta */
+export const shadows = {
+  cta: {
+    shadowColor: "#14231f",
+    shadowOpacity: 0.12,
+    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 6,
+  },
 } as const;
 
 /**
@@ -44,12 +59,12 @@ export const fonts = {
 } as const;
 
 export const type = {
-  /** .brand-hero — hero product name */
+  /** .brand-hero — hero product name (web clamp ~3.4–5.4rem; phone ≈ 54) */
   brandHero: {
     fontFamily: fonts.display.semibold,
     fontSize: 54,
-    letterSpacing: -2.2,
-    lineHeight: 52,
+    letterSpacing: -2.16,
+    lineHeight: 51,
     color: colors.ink,
   } satisfies TextStyle,
 

@@ -1,6 +1,7 @@
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, type } from "@/lib/theme";
+import { colors, shadows, type } from "@/lib/theme";
 
 type Props = {
   busy: boolean;
@@ -47,18 +48,25 @@ export function UploadButton({ busy, busyLabel, onPicked, onError }: Props) {
   return (
     <View style={styles.wrap}>
       <Pressable
-        style={[styles.primary, busy && styles.disabled]}
+        style={[styles.primaryPress, busy && styles.disabled]}
         disabled={busy}
         onPress={() => void pick(true)}
       >
-        {busy ? (
-          <ActivityIndicator color="#f4faf8" />
-        ) : (
-          <Text style={styles.primaryLabel}>Take receipt photo</Text>
-        )}
-        <Text style={styles.hint}>
-          {busy ? busyLabel ?? "Working…" : "Uses your camera"}
-        </Text>
+        <LinearGradient
+          colors={[colors.accent, colors.accentDeep]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.primary}
+        >
+          {busy ? (
+            <ActivityIndicator color="#f4faf8" />
+          ) : (
+            <Text style={styles.primaryLabel}>Take receipt photo</Text>
+          )}
+          <Text style={styles.hint}>
+            {busy ? busyLabel ?? "Working…" : "Uses your camera"}
+          </Text>
+        </LinearGradient>
       </Pressable>
 
       <Pressable
@@ -75,22 +83,21 @@ export function UploadButton({ busy, busyLabel, onPicked, onError }: Props) {
 const styles = StyleSheet.create({
   wrap: {
     width: "100%",
-    gap: 12,
+    maxWidth: 352,
+    gap: 14,
     alignItems: "center",
+  },
+  primaryPress: {
+    width: "100%",
+    borderRadius: 18,
+    ...shadows.cta,
   },
   primary: {
     width: "100%",
-    maxWidth: 360,
     borderRadius: 18,
     paddingVertical: 18,
-    paddingHorizontal: 20,
-    backgroundColor: colors.accent,
+    paddingHorizontal: 22,
     alignItems: "center",
-    shadowColor: colors.ink,
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 4,
   },
   primaryLabel: {
     ...type.ctaLabel,
@@ -100,17 +107,17 @@ const styles = StyleSheet.create({
     ...type.ctaHint,
   },
   secondary: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.line,
-    backgroundColor: "rgba(247,248,244,0.72)",
+    backgroundColor: "rgba(247,248,244,0.8)",
   },
   secondaryLabel: {
     ...type.button,
   },
   disabled: {
-    opacity: 0.7,
+    opacity: 0.88,
   },
 });

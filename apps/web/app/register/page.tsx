@@ -4,6 +4,35 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  PASSWORD_MIN_LENGTH,
+  validateRegisterInput,
+} from "@splitshot/shared";
+
+async function readErrorMessage(res: Response): Promise<string> {
+  const text = await res.text();
+  if (!text) {
+    return res.ok ? "" : "Registration failed";
+  }
+  try {
+    const payload = JSON.parse(text) as { error?: unknown };
+    if (typeof payload.error === "string" && payload.error.trim()) {
+      return payload.error;
+    }
+  } catch {
+    // Non-JSON bodies (HTML/empty) — never surface Safari's cryptic parse error.
+  }
+  return "Registration failed";
+}
+
+function friendlyError(err: unknown, fallback: string): string {
+  if (!(err instanceof Error) || !err.message) return fallback;
+  const msg = err.message;
+  if (/did not match the expected pattern|unexpected end of json|JSON/i.test(msg)) {
+    return fallback;
+  }
+  return msg;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,28 +46,47 @@ export default function RegisterPage() {
     e.preventDefault();
     setBusy(true);
     setError(null);
+
+    const parsed = validateRegisterInput({ name, email, password });
+    if (!parsed.ok) {
+      setError(parsed.error);
+      setBusy(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify(parsed.data),
       });
-      const payload = await res.json();
       if (!res.ok) {
-        throw new Error(payload.error ?? "Registration failed");
+        throw new Error(await readErrorMessage(res));
       }
-      const login = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-      if (login?.error) {
-        throw new Error("Account created — please sign in");
+
+      try {
+        const login = await signIn("credentials", {
+          email: parsed.data.email,
+          password: parsed.data.password,
+          redirect: false,
+        });
+        if (login?.error) {
+          setError("Account created — please sign in");
+          return;
+        }
+      } catch (signInErr) {
+        // Auth.js may return an empty body; Safari then throws a cryptic
+        // "expected pattern" TypeError from response.json().
+        setError(
+          friendlyError(signInErr, "Account created — please sign in"),
+        );
+        return;
       }
+
       router.push("/history");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(friendlyError(err, "Registration failed"));
     } finally {
       setBusy(false);
     }
@@ -46,7 +94,7 @@ export default function RegisterPage() {
 
   return (
     <main className="auth-page">
-      <form className="auth-card" onSubmit={onSubmit}>
+      <form className="auth-card" onSubmit={onSubmit} noValidate>
         <p className="brand-mark">
           <Link href="/">SplitShot</Link>
         </p>
@@ -75,10 +123,11 @@ export default function RegisterPage() {
           <input
             type="password"
             required
-            minLength={8}
+            minLength={PASSWORD_MIN_LENGTH}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
+            placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
           />
         </label>
         {error ? <p className="form-error">{error}</p> : null}

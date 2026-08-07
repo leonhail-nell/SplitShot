@@ -42,7 +42,7 @@ export default function HomeScreen() {
           {authed ? (
             <>
               <Link href="/history" style={styles.navLink}>
-                History
+                Your splits
               </Link>
               <Pressable
                 onPress={() => {
@@ -52,8 +52,9 @@ export default function HomeScreen() {
                     setUser(null);
                   })();
                 }}
+                style={styles.navBtnPress}
               >
-                <Text style={styles.navLink}>Sign out</Text>
+                <Text style={styles.navBtnText}>Sign out</Text>
               </Pressable>
             </>
           ) : (
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   },
   nav: {
     paddingHorizontal: 16,
-    paddingTop: 4,
+    paddingTop: 8,
     paddingBottom: 8,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -139,61 +140,81 @@ const styles = StyleSheet.create({
   navBrand: {
     ...type.brandNav,
   },
-  navLinks: { flexDirection: "row", alignItems: "center", gap: 12 },
+  navLinks: { flexDirection: "row", alignItems: "center", gap: 14 },
   navLink: {
-    fontFamily: fonts.sans.semibold,
+    fontFamily: fonts.sans.regular,
     fontSize: 15,
-    color: colors.inkSoft,
+    color: colors.ink,
   },
+  /** Web .nav-btn / .nav-btn-link — soft sheet pill, not solid ink */
   navBtn: {
-    backgroundColor: colors.ink,
-    color: colors.onInk,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: "rgba(247, 248, 244, 0.8)",
     overflow: "hidden",
     borderRadius: 999,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    fontFamily: fonts.sans.semibold,
+    fontFamily: fonts.sans.regular,
     fontSize: 15,
+    color: colors.ink,
+  },
+  navBtnPress: {
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: "rgba(247, 248, 244, 0.8)",
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  navBtnText: {
+    fontFamily: fonts.sans.regular,
+    fontSize: 15,
+    color: colors.ink,
   },
   hero: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 24,
-    gap: 12,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
   },
   brand: {
     ...type.brandHero,
+    marginBottom: 12,
     textAlign: "center",
   },
   headline: {
     ...type.headline,
-    maxWidth: 280,
+    maxWidth: 300,
     textAlign: "center",
   },
   lede: {
     ...type.body,
-    maxWidth: 320,
-    marginBottom: 12,
+    maxWidth: 340,
+    marginTop: 16,
+    marginBottom: 28,
     textAlign: "center",
   },
   signedIn: {
-    fontFamily: fonts.sans.medium,
-    color: colors.accentDeep,
+    fontFamily: fonts.sans.regular,
+    color: colors.inkSoft,
     fontSize: 13,
-    marginBottom: 4,
+    opacity: 0.7,
+    marginTop: -12,
+    marginBottom: 20,
     textAlign: "center",
   },
   error: {
     ...type.error,
-    marginTop: 8,
+    marginTop: 12,
     textAlign: "center",
   },
   apiHint: {
-    marginTop: 18,
+    marginTop: 20,
     fontFamily: fonts.sans.regular,
     fontSize: 12,
-    color: "rgba(20,35,31,0.55)",
+    color: "rgba(20,35,31,0.4)",
     textAlign: "center",
   },
 });
