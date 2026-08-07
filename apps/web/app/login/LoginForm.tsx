@@ -65,6 +65,9 @@ export default function LoginForm() {
         <p className="auth-switch">
           No account? <Link href="/register">Register</Link>
         </p>
+        <p className="auth-switch">
+          <Link href="/">Back home</Link>
+        </p>
       </form>
     </main>
   );

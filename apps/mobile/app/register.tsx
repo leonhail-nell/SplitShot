@@ -92,6 +92,9 @@ export default function RegisterScreen() {
         <Link href="/login" style={styles.link}>
           Already have an account?
         </Link>
+        <Link href="/" style={styles.linkMuted}>
+          Back home
+        </Link>
       </View>
     </SafeAreaView>
   );
@@ -156,5 +159,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.sans.semibold,
     fontSize: 14,
     color: colors.accentDeep,
+  },
+  linkMuted: {
+    textAlign: "center",
+    fontFamily: fonts.sans.regular,
+    fontSize: 14,
+    color: colors.inkSoft,
+    opacity: 0.7,
+    marginTop: 4,
   },
 });

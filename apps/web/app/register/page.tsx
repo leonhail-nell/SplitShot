@@ -137,6 +137,9 @@ export default function RegisterPage() {
         <p className="auth-switch">
           Already have an account? <Link href="/login">Sign in</Link>
         </p>
+        <p className="auth-switch">
+          <Link href="/">Back home</Link>
+        </p>
       </form>
     </main>
   );
