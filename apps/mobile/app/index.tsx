@@ -7,6 +7,7 @@ import { createSession, ensurePushRegistered, logout, parseReceipt } from "@/lib
 import { getStoredUser, getToken } from "@/lib/authStorage";
 import { API_URL } from "@/lib/config";
 import type { StoredUser } from "@/lib/authStorage";
+import { colors, fonts, type } from "@/lib/theme";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -125,7 +126,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#d5e0d8",
+    backgroundColor: "transparent",
   },
   nav: {
     paddingHorizontal: 16,
@@ -136,55 +137,63 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   navBrand: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#14231f",
+    ...type.brandNav,
   },
   navLinks: { flexDirection: "row", alignItems: "center", gap: 12 },
-  navLink: { color: "#2a4038", fontWeight: "600" },
+  navLink: {
+    fontFamily: fonts.sans.semibold,
+    fontSize: 15,
+    color: colors.inkSoft,
+  },
   navBtn: {
-    backgroundColor: "#14231f",
-    color: "#f3f7f4",
+    backgroundColor: colors.ink,
+    color: colors.onInk,
     overflow: "hidden",
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    fontWeight: "600",
+    fontFamily: fonts.sans.semibold,
+    fontSize: 15,
   },
   hero: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 24,
     gap: 12,
   },
   brand: {
-    fontSize: 48,
-    fontWeight: "700",
-    color: "#14231f",
-    letterSpacing: -1.2,
+    ...type.brandHero,
+    textAlign: "center",
   },
   headline: {
-    fontSize: 22,
-    fontWeight: "500",
-    color: "#2a4038",
+    ...type.headline,
     maxWidth: 280,
-    lineHeight: 28,
+    textAlign: "center",
   },
   lede: {
-    fontSize: 16,
-    color: "#2a4038",
-    lineHeight: 22,
+    ...type.body,
     maxWidth: 320,
     marginBottom: 12,
+    textAlign: "center",
   },
-  signedIn: { color: "#0a4f4f", fontSize: 13, marginBottom: 4 },
+  signedIn: {
+    fontFamily: fonts.sans.medium,
+    color: colors.accentDeep,
+    fontSize: 13,
+    marginBottom: 4,
+    textAlign: "center",
+  },
   error: {
-    color: "#8a3b2b",
+    ...type.error,
     marginTop: 8,
+    textAlign: "center",
   },
   apiHint: {
     marginTop: 18,
+    fontFamily: fonts.sans.regular,
     fontSize: 12,
     color: "rgba(20,35,31,0.55)",
+    textAlign: "center",
   },
 });

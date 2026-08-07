@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SplitEditor } from "@/components/SplitEditor";
 import { getSession } from "@/lib/api";
+import { colors, type } from "@/lib/theme";
 import type { SessionPayload } from "@/lib/types";
 
 export default function SessionScreen() {
@@ -39,7 +40,7 @@ export default function SessionScreen() {
       <Stack.Screen options={{ title: "Split", headerShown: false }} />
       {!session && !error ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#0d6e6e" />
+          <ActivityIndicator color={colors.accent} />
           <Text style={styles.muted}>Loading split…</Text>
         </View>
       ) : null}
@@ -54,7 +55,7 @@ export default function SessionScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#dfe7db" },
+  safe: { flex: 1, backgroundColor: "transparent" },
   center: {
     flex: 1,
     alignItems: "center",
@@ -62,6 +63,6 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 24,
   },
-  muted: { color: "#2a4038" },
-  error: { color: "#8a3b2b", textAlign: "center" },
+  muted: { ...type.body, textAlign: "center" },
+  error: { ...type.error, textAlign: "center" },
 });

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { register } from "@/lib/api";
+import { colors, fonts, type } from "@/lib/theme";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -83,47 +84,63 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#d5e0d8", justifyContent: "center" },
+  safe: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
   card: {
-    marginHorizontal: 20,
-    backgroundColor: "#f7f8f4",
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: colors.sheet,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(20,35,31,0.14)",
+    borderColor: colors.line,
     padding: 20,
     gap: 8,
   },
-  brand: { fontSize: 28, fontWeight: "700", color: "#14231f" },
-  title: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#2a4038",
-    marginBottom: 8,
+  brand: {
+    ...type.brandAuth,
+    textAlign: "center",
   },
-  label: { color: "#2a4038", fontSize: 13, marginTop: 4 },
+  title: {
+    ...type.title,
+    fontSize: 22,
+    color: colors.inkSoft,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  label: { ...type.label, marginTop: 4 },
   input: {
     borderWidth: 1,
-    borderColor: "rgba(20,35,31,0.14)",
+    borderColor: colors.line,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     backgroundColor: "#fff",
-    color: "#14231f",
+    ...type.input,
   },
-  error: { color: "#8a3b2b", marginTop: 4 },
+  error: { ...type.error, marginTop: 4, textAlign: "center" },
   btn: {
     marginTop: 12,
-    backgroundColor: "#0d6e6e",
+    backgroundColor: colors.accent,
     borderRadius: 999,
     paddingVertical: 12,
     alignItems: "center",
   },
-  btnLabel: { color: "#f4faf8", fontWeight: "700" },
+  btnLabel: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 16,
+    color: colors.onAccent,
+  },
   disabled: { opacity: 0.7 },
   link: {
     marginTop: 12,
     textAlign: "center",
-    color: "#0a4f4f",
-    fontWeight: "600",
+    fontFamily: fonts.sans.semibold,
+    fontSize: 14,
+    color: colors.accentDeep,
   },
 });

@@ -15,7 +15,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^4.0.33",
+    "@ai-sdk/anthropic": "^4.0.34",
     "@auth/prisma-adapter": "^2.11.3",
     "@prisma/adapter-better-sqlite3": "^7.9.1",
     "@prisma/client": "^7.9.1",

@@ -28,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} h-full`}>
       <body className="min-h-full antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <div className="site-atmosphere" aria-hidden />
+        <div className="site-root">
+          <SessionProvider>{children}</SessionProvider>
+        </div>
       </body>
     </html>
   );

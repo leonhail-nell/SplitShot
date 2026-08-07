@@ -27,8 +27,7 @@
         "android.permission.CAMERA",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.POST_NOTIFICATIONS"
-      ],
-      "predictiveBackGestureEnabled": false
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -60,7 +59,9 @@
           "icon": "./assets/images/icon.png",
           "color": "#0d6e6e"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
@@ -68,7 +69,8 @@
       }
     },
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "autolinkingModuleResolution": true
     }
   }
 }

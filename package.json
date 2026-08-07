@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "preinstall": "node -e \"const [maj]=process.versions.node.split('.').map(Number); if(maj<22){console.error('\\nSplitShot requires Node.js 22+. You are on '+process.version+'.\\nRun: nvm use\\n'); process.exit(1)}\"",
     "dev": "npm run dev -w @splitshot/web",
     "dev:mobile": "npm run start -w @splitshot/mobile",
     "build": "npm run build -w @splitshot/shared && npm run build -w @splitshot/web",
@@ -16,5 +17,15 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "overrides": {
+    "@expo/dom-webview": "0.2.8",
+    "@splitshot/mobile": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-native": "0.81.5",
+      "react-native-safe-area-context": "~5.6.0",
+      "react-native-screens": "~4.16.0"
+    }
   }
 }

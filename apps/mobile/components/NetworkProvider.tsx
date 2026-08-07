@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { startNetworkMonitor, subscribeOnline } from "@/lib/network";
 import { flushQueue } from "@/lib/offline/queue";
+import { fonts } from "@/lib/theme";
 
 export function NetworkProvider({ children }: { children: React.ReactNode }) {
   const [online, setOnline] = useState(true);
@@ -38,9 +39,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   bannerText: {
+    fontFamily: fonts.sans.semibold,
     color: "#fff7f4",
     textAlign: "center",
-    fontWeight: "600",
     fontSize: 13,
   },
 });

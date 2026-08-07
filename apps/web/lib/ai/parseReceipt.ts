@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject } from "ai";
 import { z } from "zod";
 
@@ -43,12 +43,12 @@ export async function parseReceiptImage(params: {
   mediaType: string;
   data: Buffer;
 }): Promise<ParsedReceipt> {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not set");
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error("ANTHROPIC_API_KEY is not set");
   }
 
   const { object } = await generateObject({
-    model: openai("gpt-4o"),
+    model: anthropic("claude-sonnet-4-5"),
     schema: receiptSchema,
     messages: [
       {

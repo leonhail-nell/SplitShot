@@ -1,5 +1,6 @@
 import { Link, Stack } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+import { colors, fonts, type } from "@/lib/theme";
 
 export default function NotFoundScreen() {
   return (
@@ -22,27 +23,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
-    backgroundColor: "#d5e0d8",
+    backgroundColor: "transparent",
     gap: 12,
   },
   brand: {
+    ...type.brandAuth,
     fontSize: 36,
-    fontWeight: "700",
-    color: "#14231f",
+    textAlign: "center",
   },
   title: {
-    fontSize: 18,
-    color: "#2a4038",
+    ...type.headline,
     textAlign: "center",
   },
   link: {
     marginTop: 8,
-    backgroundColor: "#14231f",
-    color: "#f3f7f4",
+    backgroundColor: colors.ink,
+    color: colors.onInk,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 999,
     overflow: "hidden",
-    fontWeight: "600",
+    fontFamily: fonts.sans.semibold,
+    fontSize: 15,
   },
 });

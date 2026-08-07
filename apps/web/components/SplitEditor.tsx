@@ -532,7 +532,7 @@ export function SplitEditor({ initial }: Props) {
         </button>
       </section>
 
-      <aside className="totals-bar">
+      <aside className="totals-bar" aria-label="Split totals">
         <div className="totals-summary">
           <div>
             <span>Items</span>

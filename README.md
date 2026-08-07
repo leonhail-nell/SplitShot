@@ -6,7 +6,7 @@ AI receipt splitter — **Next.js web** + **Expo mobile** in one workspace.
 
 ```
 apps/web          Next.js API + web UI (@splitshot/web)
-apps/mobile       Expo app (@splitshot/mobile)
+apps/mobile       Expo app (@splitshot/mobile, SDK 54 / App Store Expo Go)
 packages/shared   Shared types, totals, formatMoney (@splitshot/shared)
 docs/             Store prep checklist
 ```
@@ -14,17 +14,20 @@ docs/             Store prep checklist
 ## Requirements
 
 - Node.js 22+
-- OpenAI API key (receipt parsing)
+- Anthropic API key (receipt parsing via Claude)
 - Optional: Stripe keys, Expo account for EAS
 
 ## Setup
 
 ```bash
-nvm use
+nvm use              # required — Node 22+ (system Node 20 breaks Prisma 7)
+node -v              # should print v22.x
 npm install          # installs all workspaces + builds shared + prisma generate
 cp apps/web/.env.example apps/web/.env
-# edit AUTH_SECRET, OPENAI_API_KEY, etc.
+# edit AUTH_SECRET, ANTHROPIC_API_KEY, etc.
 ```
+
+If `npm install` dumps a huge `@prisma/dev` / `ERR_REQUIRE_ESM` error, your shell is still on Node 20 — run `nvm use` (or `nvm install 22 && nvm use 22`) and retry.
 
 ## Run
 

@@ -4,7 +4,6 @@ import { UploadHero } from "@/components/UploadHero";
 export default function HomePage() {
   return (
     <main className="home">
-      <div className="home-atmosphere" aria-hidden />
       <div className="home-top">
         <SiteNav />
       </div>

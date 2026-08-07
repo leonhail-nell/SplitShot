@@ -9,6 +9,7 @@ This is a preparation checklist for App Store / Play Console. **Do not submit** 
 | iOS bundle ID | `com.splitshot.app` |
 | Android applicationId | `com.splitshot.app` |
 | Expo slug | `splitshot-mobile` |
+| Expo SDK | `54` (App Store Expo Go compatible) |
 
 Replace `extra.eas.projectId` in `apps/mobile/app.json` after running `eas init`.
 

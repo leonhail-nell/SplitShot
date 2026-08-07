@@ -1,5 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, type } from "@/lib/theme";
 
 type Props = {
   busy: boolean;
@@ -83,35 +84,31 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingVertical: 18,
     paddingHorizontal: 20,
-    backgroundColor: "#0d6e6e",
+    backgroundColor: colors.accent,
     alignItems: "center",
-    shadowColor: "#14231f",
+    shadowColor: colors.ink,
     shadowOpacity: 0.18,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 10 },
     elevation: 4,
   },
   primaryLabel: {
-    color: "#f4faf8",
-    fontSize: 18,
-    fontWeight: "700",
+    ...type.ctaLabel,
   },
   hint: {
     marginTop: 4,
-    color: "rgba(244,250,248,0.82)",
-    fontSize: 13,
+    ...type.ctaHint,
   },
   secondary: {
     paddingVertical: 12,
     paddingHorizontal: 18,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "rgba(20,35,31,0.16)",
+    borderColor: colors.line,
     backgroundColor: "rgba(247,248,244,0.72)",
   },
   secondaryLabel: {
-    color: "#14231f",
-    fontWeight: "600",
+    ...type.button,
   },
   disabled: {
     opacity: 0.7,
