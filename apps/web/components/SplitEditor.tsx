@@ -282,11 +282,8 @@ export function SplitEditor({ initial }: Props) {
     <div className="editor">
       <header className="editor-top">
         <div>
-          <p className="brand-mark">
-            <a href="/">SplitShot</a>
-          </p>
           <input
-            className="merchant-input"
+            className="merchant-input merchant-input-lead"
             value={merchant}
             onChange={(e) => setMerchant(e.target.value)}
             placeholder="Merchant name"

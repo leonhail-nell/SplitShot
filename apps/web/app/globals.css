@@ -234,8 +234,11 @@ input {
 
 .session-page {
   min-height: 100dvh;
-  padding: 1.5rem clamp(1rem, 3vw, 1.75rem)
+  padding: 1rem clamp(1rem, 3vw, 1.75rem)
     calc(2rem + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
 }
 
 .editor {
@@ -281,6 +284,15 @@ input {
   font-size: 1.05rem;
   color: var(--ink-soft);
   transition: border-color 160ms ease;
+}
+
+.merchant-input-lead {
+  margin-top: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
 }
 
 .merchant-input:focus {

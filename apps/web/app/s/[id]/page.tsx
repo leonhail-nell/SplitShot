@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SiteNav } from "@/components/SiteNav";
 import { SplitEditor } from "@/components/SplitEditor";
 import { getSessionPayload } from "@/lib/session";
 
@@ -13,6 +14,7 @@ export default async function SessionPage({ params }: PageProps) {
 
   return (
     <main className="session-page">
+      <SiteNav />
       <SplitEditor initial={session} />
     </main>
   );
