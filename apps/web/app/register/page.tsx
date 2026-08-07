@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   PASSWORD_MIN_LENGTH,
@@ -41,15 +41,20 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Sync guard — React state alone cannot block a double-click before re-render.
+  const inFlight = useRef(false);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setError(null);
 
     const parsed = validateRegisterInput({ name, email, password });
     if (!parsed.ok) {
       setError(parsed.error);
+      inFlight.current = false;
       setBusy(false);
       return;
     }
@@ -88,6 +93,7 @@ export default function RegisterPage() {
     } catch (err) {
       setError(friendlyError(err, "Registration failed"));
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }

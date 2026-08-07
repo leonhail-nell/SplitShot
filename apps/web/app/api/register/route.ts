@@ -1,19 +1,59 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { validateRegisterInput } from "@splitshot/shared";
-import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 
+function errorMessage(err: unknown): string {
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === "string") return err;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return String(err);
+  }
+}
+
+/** Duck-type P2002 — instanceof can fail across Turbopack module copies. */
 function isUniqueEmailError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const e = err as {
+    code?: unknown;
+    meta?: { target?: unknown; driverAdapterError?: { cause?: { constraint?: { fields?: unknown } } } };
+  };
+  if (e.code !== "P2002") return false;
+  const target = e.meta?.target;
+  if (Array.isArray(target)) {
+    return target.some((t) => t === "email" || String(t).includes("email"));
+  }
+  const fields = e.meta?.driverAdapterError?.cause?.constraint?.fields;
+  if (Array.isArray(fields)) {
+    return fields.some((t) => t === "email" || String(t).includes("email"));
+  }
+  // Unique on User without a clear target — treat as email conflict.
+  return true;
+}
+
+function isSqliteBusyOrTimeout(err: unknown): boolean {
+  const msg = errorMessage(err).toLowerCase();
   return (
-    err instanceof Prisma.PrismaClientKnownRequestError &&
-    err.code === "P2002" &&
-    (Array.isArray(err.meta?.target)
-      ? err.meta.target.includes("email")
-      : true)
+    msg.includes("operation has timed out") ||
+    msg.includes("database is locked") ||
+    msg.includes("sqlite_busy") ||
+    msg.includes("timeout while waiting for mutex")
   );
+}
+
+async function createUser(name: string, email: string, passwordHash: string) {
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    return { kind: "exists" as const };
+  }
+  const user = await prisma.user.create({
+    data: { name, email, passwordHash },
+  });
+  return { kind: "created" as const, user };
 }
 
 export async function POST(request: Request) {
@@ -39,29 +79,37 @@ export async function POST(request: Request) {
   const { name, email, password } = parsed.data;
 
   try {
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    let result;
+    try {
+      result = await createUser(name, email, passwordHash);
+    } catch (err) {
+      // One retry after a brief wait — covers SQLITE_BUSY / busy-timeout races
+      // from concurrent API traffic on the same SQLite file.
+      if (!isSqliteBusyOrTimeout(err)) throw err;
+      console.warn("register sqlite busy, retrying once", errorMessage(err));
+      await new Promise((r) => setTimeout(r, 50));
+      result = await createUser(name, email, passwordHash);
+    }
+
+    if (result.kind === "exists") {
       return NextResponse.json(
         { error: "An account with that email already exists" },
         { status: 409 },
       );
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-      },
-    });
-
     return NextResponse.json(
-      { id: user.id, email: user.email, name: user.name },
+      {
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
+      },
       { status: 201 },
     );
   } catch (err) {
-    console.error("register failed", err);
+    console.error("register failed", errorMessage(err), err);
     if (isUniqueEmailError(err)) {
       return NextResponse.json(
         { error: "An account with that email already exists" },
@@ -69,9 +117,7 @@ export async function POST(request: Request) {
       );
     }
     const detail =
-      process.env.NODE_ENV !== "production" && err instanceof Error
-        ? err.message
-        : undefined;
+      process.env.NODE_ENV !== "production" ? errorMessage(err) : undefined;
     return NextResponse.json(
       {
         error: "Could not create account. Please try again.",
