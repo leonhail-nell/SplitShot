@@ -35,13 +35,18 @@ function isUniqueEmailError(err: unknown): boolean {
   return true;
 }
 
-function isSqliteBusyOrTimeout(err: unknown): boolean {
+function isDatabaseMisconfiguredError(err: unknown): boolean {
   const msg = errorMessage(err).toLowerCase();
   return (
-    msg.includes("operation has timed out") ||
-    msg.includes("database is locked") ||
-    msg.includes("sqlite_busy") ||
-    msg.includes("timeout while waiting for mutex")
+    msg.includes("database_url") ||
+    msg.includes("cannot open database") ||
+    msg.includes("directory does not exist") ||
+    msg.includes("sqlite") ||
+    msg.includes("must be a postgresql") ||
+    msg.includes("can't reach database server") ||
+    msg.includes("password authentication failed") ||
+    msg.includes("tenant or user not found") ||
+    (msg.includes("relation") && msg.includes("does not exist"))
   );
 }
 
@@ -80,18 +85,7 @@ export async function POST(request: Request) {
 
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-
-    let result;
-    try {
-      result = await createUser(name, email, passwordHash);
-    } catch (err) {
-      // One retry after a brief wait — covers SQLITE_BUSY / busy-timeout races
-      // from concurrent API traffic on the same SQLite file.
-      if (!isSqliteBusyOrTimeout(err)) throw err;
-      console.warn("register sqlite busy, retrying once", errorMessage(err));
-      await new Promise((r) => setTimeout(r, 50));
-      result = await createUser(name, email, passwordHash);
-    }
+    const result = await createUser(name, email, passwordHash);
 
     if (result.kind === "exists") {
       return NextResponse.json(
@@ -114,6 +108,19 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "An account with that email already exists" },
         { status: 409 },
+      );
+    }
+    if (isDatabaseMisconfiguredError(err)) {
+      return NextResponse.json(
+        {
+          error:
+            "Database is not ready. Production requires PostgreSQL (Neon) with migrations applied.",
+          code: "DB_UNAVAILABLE",
+          ...(process.env.NODE_ENV !== "production"
+            ? { detail: errorMessage(err) }
+            : {}),
+        },
+        { status: 503 },
       );
     }
     const detail =
