@@ -1,5 +1,6 @@
 "use client";
 
+import { avatarTone, personInitials } from "@splitshot/shared";
 import { nanoid } from "nanoid";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
@@ -326,6 +327,13 @@ export function SplitEditor({ initial }: Props) {
         <div className="people-row">
           {people.map((person) => (
             <div key={person.id} className="person-chip">
+              <span
+                className="person-avatar"
+                style={{ backgroundColor: avatarTone(person.id) }}
+                aria-hidden
+              >
+                {personInitials(person.name)}
+              </span>
               <input
                 value={person.name}
                 aria-label="Person name"

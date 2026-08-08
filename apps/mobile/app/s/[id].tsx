@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,9 +7,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenNav } from "@/components/ScreenNav";
 import { SplitEditor } from "@/components/SplitEditor";
 import { getSession } from "@/lib/api";
-import { colors, type } from "@/lib/theme";
+import { colors, fonts, type } from "@/lib/theme";
 import type { SessionPayload } from "@/lib/types";
 
 export default function SessionScreen() {
@@ -36,8 +37,9 @@ export default function SessionScreen() {
   }, [id]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+    <SafeAreaView style={styles.safe} edges={["top", "bottom", "left", "right"]}>
       <Stack.Screen options={{ title: "Split", headerShown: false }} />
+      <ScreenNav />
       {!session && !error ? (
         <View style={styles.center}>
           <ActivityIndicator color={colors.accent} />
@@ -47,22 +49,41 @@ export default function SessionScreen() {
       {error ? (
         <View style={styles.center}>
           <Text style={styles.error}>{error}</Text>
+          <Link href="/" style={styles.homeCta}>
+            Back home
+          </Link>
         </View>
       ) : null}
-      {session ? <SplitEditor initial={session} /> : null}
+      {session ? (
+        <View style={styles.editorWrap}>
+          <SplitEditor initial={session} />
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "transparent" },
+  editorWrap: { flex: 1 },
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 14,
     padding: 24,
   },
   muted: { ...type.body, textAlign: "center" },
   error: { ...type.error, textAlign: "center" },
+  homeCta: {
+    marginTop: 4,
+    backgroundColor: colors.ink,
+    color: colors.onInk,
+    overflow: "hidden",
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontFamily: fonts.sans.semibold,
+    fontSize: 15,
+  },
 });

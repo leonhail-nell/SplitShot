@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
 
@@ -7,6 +8,14 @@ export async function SiteNav() {
   return (
     <nav className="site-nav">
       <Link href="/" className="nav-brand">
+        <Image
+          src="/logo.png"
+          alt=""
+          width={28}
+          height={28}
+          className="nav-logo"
+          priority
+        />
         SplitShot
       </Link>
       <div className="nav-links">

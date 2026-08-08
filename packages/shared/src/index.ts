@@ -6,6 +6,7 @@ export {
   type SplitTotals,
 } from "./totals";
 export { formatMoney } from "./format";
+export { personInitials, avatarTone } from "./avatar";
 export {
   PASSWORD_MIN_LENGTH,
   PASSWORD_MAX_LENGTH,

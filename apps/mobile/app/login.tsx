@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenNav } from "@/components/ScreenNav";
 import { login } from "@/lib/api";
 import { colors, fonts, type } from "@/lib/theme";
 
@@ -21,62 +22,64 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.card}>
-        <Text style={styles.brand}>SplitShot</Text>
-        <Text style={styles.title}>Sign in</Text>
+      <ScreenNav />
+      <View style={styles.center}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Sign in</Text>
 
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-          value={email}
-          onChangeText={setEmail}
-        />
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          secureTextEntry
-          autoComplete="password"
-          value={password}
-          onChangeText={setPassword}
-        />
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            autoComplete="password"
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Pressable
-          style={[styles.btn, busy && styles.disabled]}
-          disabled={busy}
-          onPress={() => {
-            void (async () => {
-              setBusy(true);
-              setError(null);
-              try {
-                await login(email.trim(), password);
-                router.replace("/history");
-              } catch (err) {
-                setError(err instanceof Error ? err.message : "Sign in failed");
-              } finally {
-                setBusy(false);
-              }
-            })();
-          }}
-        >
-          {busy ? (
-            <ActivityIndicator color="#f4faf8" />
-          ) : (
-            <Text style={styles.btnLabel}>Sign in</Text>
-          )}
-        </Pressable>
+          <Pressable
+            style={[styles.btn, busy && styles.disabled]}
+            disabled={busy}
+            onPress={() => {
+              void (async () => {
+                setBusy(true);
+                setError(null);
+                try {
+                  await login(email.trim(), password);
+                  router.replace("/history");
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Sign in failed");
+                } finally {
+                  setBusy(false);
+                }
+              })();
+            }}
+          >
+            {busy ? (
+              <ActivityIndicator color="#f4faf8" />
+            ) : (
+              <Text style={styles.btnLabel}>Sign in</Text>
+            )}
+          </Pressable>
 
-        <Link href="/register" style={styles.link}>
-          Create an account
-        </Link>
-        <Link href="/" style={styles.linkMuted}>
-          Back home
-        </Link>
+          <Link href="/register" style={styles.link}>
+            Create an account
+          </Link>
+          <Link href="/" style={styles.linkMuted}>
+            Back home
+          </Link>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -86,6 +89,9 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: "transparent",
+  },
+  center: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -99,10 +105,6 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     padding: 20,
     gap: 8,
-  },
-  brand: {
-    ...type.brandAuth,
-    textAlign: "center",
   },
   title: {
     ...type.title,

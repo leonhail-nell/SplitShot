@@ -1,3 +1,4 @@
+import { avatarTone, personInitials } from "@splitshot/shared";
 import { nanoid } from "nanoid/non-secure";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -235,17 +236,15 @@ export function SplitEditor({ initial }: Props) {
   return (
     <View style={styles.root}>
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.topRow}>
-          <Text style={styles.brand}>SplitShot</Text>
-          <View style={styles.topActions}>
-            <Text style={styles.savePill}>{saving ? "Saving…" : "Saved"}</Text>
-            <Pressable style={styles.shareBtn} onPress={() => void shareLink()}>
-              <Text style={styles.shareLabel}>Share</Text>
-            </Pressable>
-          </View>
+          <Text style={styles.savePill}>{saving ? "Saving…" : "Saved"}</Text>
+          <Pressable style={styles.shareBtn} onPress={() => void shareLink()}>
+            <Text style={styles.shareLabel}>Share</Text>
+          </Pressable>
         </View>
 
         <TextInput
@@ -278,6 +277,16 @@ export function SplitEditor({ initial }: Props) {
         <View style={styles.peopleRow}>
           {people.map((person) => (
             <View key={person.id} style={styles.personChip}>
+              <View
+                style={[
+                  styles.avatar,
+                  { backgroundColor: avatarTone(person.id) },
+                ]}
+              >
+                <Text style={styles.avatarText}>
+                  {personInitials(person.name)}
+                </Text>
+              </View>
               <TextInput
                 style={styles.personInput}
                 value={person.name}
@@ -498,8 +507,6 @@ export function SplitEditor({ initial }: Props) {
             <Text style={styles.ghostLabel}>+ Add item</Text>
           </Pressable>
         </View>
-
-        <View style={{ height: 220 }} />
       </ScrollView>
 
       <View style={styles.totalsBar}>
@@ -521,32 +528,38 @@ export function SplitEditor({ initial }: Props) {
             emphasize
           />
         </View>
-        {shownTotals.byPerson.map((row) => {
-          const person = people.find((p) => p.id === row.personId);
-          return (
-            <View key={row.personId} style={styles.personTotal}>
-              <Text style={styles.personTotalName}>
-                {row.name}
-                {person?.paid ? " · paid" : ""}
-              </Text>
-              <View style={styles.personActions}>
-                <Text style={styles.personTotalValue}>
-                  {formatMoney(row.total, displayCurrency)}
+        <ScrollView
+          style={styles.totalsPeople}
+          nestedScrollEnabled
+          keyboardShouldPersistTaps="handled"
+        >
+          {shownTotals.byPerson.map((row) => {
+            const person = people.find((p) => p.id === row.personId);
+            return (
+              <View key={row.personId} style={styles.personTotal}>
+                <Text style={styles.personTotalName}>
+                  {row.name}
+                  {person?.paid ? " · paid" : ""}
                 </Text>
-                <Pressable onPress={() => void copyOwe(row.personId)}>
-                  <Text style={styles.miniBtn}>
-                    {copiedOwe === row.personId ? "Sent" : "Owe"}
+                <View style={styles.personActions}>
+                  <Text style={styles.personTotalValue}>
+                    {formatMoney(row.total, displayCurrency)}
                   </Text>
-                </Pressable>
-                {stripeEnabled && !person?.paid ? (
-                  <Pressable onPress={() => void checkout(row.personId)}>
-                    <Text style={styles.miniBtn}>Pay</Text>
+                  <Pressable onPress={() => void copyOwe(row.personId)}>
+                    <Text style={styles.miniBtn}>
+                      {copiedOwe === row.personId ? "Sent" : "Owe"}
+                    </Text>
                   </Pressable>
-                ) : null}
+                  {stripeEnabled && !person?.paid ? (
+                    <Pressable onPress={() => void checkout(row.personId)}>
+                      <Text style={styles.miniBtn}>Pay</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
               </View>
-            </View>
-          );
-        })}
+            );
+          })}
+        </ScrollView>
       </View>
     </View>
   );
@@ -597,17 +610,15 @@ function TotalCell({
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "transparent" },
-  scroll: { padding: 16, paddingBottom: 24 },
+  scrollView: { flex: 1 },
+  scroll: { padding: 16, paddingBottom: 20 },
   topRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
+    gap: 10,
     marginBottom: 8,
   },
-  brand: {
-    ...type.brandMark,
-  },
-  topActions: { flexDirection: "row", alignItems: "center", gap: 10 },
   savePill: {
     fontFamily: fonts.sans.regular,
     color: colors.inkSoft,
@@ -625,9 +636,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
     paddingVertical: 8,
-    fontFamily: fonts.sans.regular,
-    fontSize: 16,
-    color: colors.inkSoft,
+    fontFamily: fonts.display.semibold,
+    fontSize: 20,
+    letterSpacing: -0.5,
+    color: colors.ink,
     textAlign: "center",
   },
   liveRow: {
@@ -679,10 +691,23 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     backgroundColor: "rgba(247,248,244,0.8)",
     borderRadius: 999,
-    paddingLeft: 12,
+    paddingLeft: 4,
     paddingRight: 6,
     paddingVertical: 4,
     gap: 4,
+  },
+  avatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 11,
+    color: colors.onAccent,
+    letterSpacing: 0.3,
   },
   personInput: {
     minWidth: 64,
@@ -851,14 +876,15 @@ const styles = StyleSheet.create({
   },
   ghostLabel: { ...type.button },
   totalsBar: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 12,
-    maxHeight: "42%",
+    marginHorizontal: 12,
+    marginBottom: 12,
+    maxHeight: "38%",
     backgroundColor: "rgba(20,35,31,0.94)",
     borderRadius: 16,
     padding: 14,
+  },
+  totalsPeople: {
+    maxHeight: 140,
   },
   totalsSummary: { flexDirection: "row", flexWrap: "wrap", marginBottom: 8 },
   totalCell: { flex: 1, minWidth: 72, alignItems: "center" },

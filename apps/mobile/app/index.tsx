@@ -1,12 +1,10 @@
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UploadButton } from "@/components/UploadButton";
 import { createSession, ensurePushRegistered, logout, parseReceipt } from "@/lib/api";
-import { getStoredUser, getToken } from "@/lib/authStorage";
-import { API_URL } from "@/lib/config";
-import type { StoredUser } from "@/lib/authStorage";
+import { getToken } from "@/lib/authStorage";
 import { colors, fonts, type } from "@/lib/theme";
 
 export default function HomeScreen() {
@@ -14,7 +12,6 @@ export default function HomeScreen() {
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<"idle" | "uploading" | "parsing">("idle");
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<StoredUser | null>(null);
   const [authed, setAuthed] = useState(false);
 
   useFocusEffect(
@@ -22,10 +19,8 @@ export default function HomeScreen() {
       let active = true;
       void (async () => {
         const token = await getToken();
-        const stored = await getStoredUser();
         if (!active) return;
         setAuthed(Boolean(token));
-        setUser(stored);
         if (token) void ensurePushRegistered();
       })();
       return () => {
@@ -37,7 +32,13 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.nav}>
-        <Text style={styles.navBrand}>SplitShot</Text>
+        <View style={styles.navBrandRow}>
+          <Image
+            source={require("@/assets/images/logo.png")}
+            style={styles.navLogo}
+          />
+          <Text style={styles.navBrand}>SplitShot</Text>
+        </View>
         <View style={styles.navLinks}>
           {authed ? (
             <>
@@ -49,7 +50,6 @@ export default function HomeScreen() {
                   void (async () => {
                     await logout();
                     setAuthed(false);
-                    setUser(null);
                   })();
                 }}
                 style={styles.navBtnPress}
@@ -71,15 +71,16 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.hero}>
+        <Image
+          source={require("@/assets/images/logo.png")}
+          style={styles.heroLogo}
+        />
         <Text style={styles.brand}>SplitShot</Text>
         <Text style={styles.headline}>Fair splits from a receipt photo.</Text>
         <Text style={styles.lede}>
           Snap the check, let AI pull the line items, tap who ordered what, and
           share the link.
         </Text>
-        {user?.email ? (
-          <Text style={styles.signedIn}>Signed in as {user.email}</Text>
-        ) : null}
 
         <UploadButton
           busy={busy}
@@ -118,7 +119,6 @@ export default function HomeScreen() {
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Text style={styles.apiHint}>API: {API_URL}</Text>
       </View>
     </SafeAreaView>
   );
@@ -139,6 +139,16 @@ const styles = StyleSheet.create({
   },
   navBrand: {
     ...type.brandNav,
+  },
+  navBrandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  navLogo: {
+    width: 28,
+    height: 28,
+    borderRadius: 7,
   },
   navLinks: { flexDirection: "row", alignItems: "center", gap: 14 },
   navLink: {
@@ -179,6 +189,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 32,
   },
+  heroLogo: {
+    width: 72,
+    height: 72,
+    borderRadius: 18,
+    marginBottom: 14,
+  },
   brand: {
     ...type.brandHero,
     marginBottom: 12,
@@ -196,25 +212,9 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     textAlign: "center",
   },
-  signedIn: {
-    fontFamily: fonts.sans.regular,
-    color: colors.inkSoft,
-    fontSize: 13,
-    opacity: 0.7,
-    marginTop: -12,
-    marginBottom: 20,
-    textAlign: "center",
-  },
   error: {
     ...type.error,
     marginTop: 12,
-    textAlign: "center",
-  },
-  apiHint: {
-    marginTop: 20,
-    fontFamily: fonts.sans.regular,
-    fontSize: 12,
-    color: "rgba(20,35,31,0.4)",
     textAlign: "center",
   },
 });
